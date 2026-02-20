@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVIDIA-Style Study Progress Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0d0d0d;
+            color: #e6e6e6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(87, 108, 67, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(30, 30, 30, 0.8) 0%, transparent 20%);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid #76b900;
+            position: relative;
+        }
+        
+        .nvidia-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #76b900;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .nvidia-logo i {
+            font-size: 2.2rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #aaaaaa;
+            font-size: 1.1rem;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .subject-card {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            border-left: 5px solid #76b900;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(118, 185, 0, 0.2);
+        }
+        
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .subject-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .subject-icon {
+            font-size: 2.2rem;
+            color: #76b900;
+        }
+        
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .progress-label {
+            font-size: 1.1rem;
+            color: #cccccc;
+        }
+        
+        .progress-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #76b900;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5a8a1b, #76b900, #a5d721);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+            box-shadow: 0 0 10px rgba(118, 185, 0, 0.5);
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.1) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.1) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 20px 20px;
+            animation: progressStripes 1s linear infinite;
+        }
+        
+        @keyframes progressStripes {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 20px 0;
+            }
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .progress-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: #1e1e1e;
+            border: 1px solid #76b900;
+            color: #76b900;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .progress-btn:hover {
+            background-color: #76b900;
+            color: #0d0d0d;
+        }
+        
+        .progress-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .total-progress {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            border-top: 5px solid #76b900;
+        }
+        
+        .total-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .total-title {
+            font-size: 1.8rem;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        
+        .total-subtitle {
+            color: #aaaaaa;
+            font-size: 1.1rem;
+        }
+        
+        .total-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: rgba(40, 40, 40, 0.7);
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #76b900;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #cccccc;
+            font-size: 1rem;
+        }
+        
+        .cookie-notice {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: rgba(40, 40, 40, 0.8);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #aaaaaa;
+            border: 1px solid #333;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .cookie-notice i {
+            color: #76b900;
+            margin-right: 8px;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid #333;
+            width: 100%;
+        }
+        
+        .reset-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 12px 25px;
+            background-color: #2a2a2a;
+            border: 2px solid #a00;
+            color: #ff5555;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background-color: #a00;
+            color: #fff;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .subject-card {
+                padding: 20px;
+            }
+            
+            .subject-title {
+                font-size: 1.6rem;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            .total-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="nvidia-logo">
+                <i class="fas fa-microchip"></i>
+                <span>NVIDIA</span>
+            </div>
+            <h1>Study Progress Tracker</h1>
+            <p class="subtitle">Track your academic progress with real-time updates</p>
+        </header>
+        
+        <div class="stats-container" id="subjectsContainer">
+            <!-- Subjects will be loaded here -->
+        </div>
+        
+        <div class="total-progress">
+            <div class="total-header">
+                <h2 class="total-title">Overall Progress</h2>
+                <p class="total-subtitle">Based on all subjects</p>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span class="progress-label">Total Completion</span>
+                    <span class="progress-value" id="totalPercentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="totalProgressBar"></div>
+                </div>
+            </div>
+            
+            <div class="total-stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="totalCompleted">0</div>
+                    <div class="stat-label">Topics Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="totalTopics">99</div>
+                    <div class="stat-label">Total Topics</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="remainingTopics">99</div>
+                    <div class="stat-label">Topics Remaining</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="reset-btn" id="resetBtn">
+            <i class="fas fa-redo"></i> Reset All Progress
+        </button>
+        
+        <div class="cookie-notice">
+            <i class="fas fa-cookie-bite"></i>
+            <span>Your progress is automatically saved in your browser's cookies. It will be preserved between sessions.</span>
+        </div>
+        
+        <footer>
+            <p>NVIDIA-Style Progress Tracker • Data stored locally in your browser</p>
+            <p>Total topics: Maths (35) | Physics (30) | Physical Chemistry (12) | Inorganic Chemistry (10) | Organic Chemistry (12)</p>
+        </footer>
+    </div>
+
+    <script>
+        // Subject data with topics count
+        const subjects = [
+            { id: 'maths', name: 'Mathematics', icon: 'fas fa-calculator', total: 35, completed: 35 },
+            { id: 'physics', name: 'Physics', icon: 'fas fa-atom', total: 30, completed: 30 },
+            { id: 'physical', name: 'Physical Chemistry', icon: 'fas fa-flask', total: 12, completed: 12 },
+            { id: 'inorganic', name: 'Inorganic Chemistry', icon: 'fas fa-vial', total: 10, completed: 10 },
+            { id: 'organic', name: 'Organic Chemistry', icon: 'fas fa-brain', total: 12, completed: 12 }
+        ];
+
+        // Cookie functions
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function loadProgressFromCookies() {
+            subjects.forEach(subject => {
+                const savedProgress = getCookie(subject.id);
+                if (savedProgress !== null) {
+                    subject.completed = parseInt(savedProgress);
+                }
+            });
+        }
+
+        function saveProgressToCookies() {
+            subjects.forEach(subject => {
+                setCookie(subject.id, subject.completed, 30); // Store for 30 days
+            });
+            
+            // Also save the last updated timestamp
+            setCookie('lastUpdated', new Date().toISOString(), 30);
+        }
+
+        // Initialize the tracker
+        function initTracker() {
+            // Load saved progress from cookies
+            loadProgressFromCookies();
+            
+            // Render subjects
+            renderSubjects();
+            
+            // Calculate and update total progress
+            updateTotalProgress();
+            
+            // Check if we have a last updated timestamp
+            const lastUpdated = getCookie('lastUpdated');
+            if (lastUpdated) {
+                const date = new Date(lastUpdated);
+                console.log(`Progress last saved: ${date.toLocaleString()}`);
+            }
+        }
+
+        // Render all subjects
+        function renderSubjects() {
+            const container = document.getElementById('subjectsContainer');
+            container.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const percentage = Math.round((subject.completed / subject.total) * 100);
+                
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                subjectCard.innerHTML = `
+                    <div class="subject-header">
+                        <h2 class="subject-title">${subject.name}</h2>
+                        <i class="${subject.icon} subject-icon"></i>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span class="progress-label">Progress</span>
+                            <span class="progress-value">${subject.completed}/${subject.total} (${percentage}%)</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="${subject.id}-bar" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="progress-btn" onclick="updateProgress('${subject.id}', -1)">
+                            <i class="fas fa-minus"></i> Decrease
+                        </button>
+                        <button class="progress-btn" onclick="updateProgress('${subject.id}', 1)">
+                            <i class="fas fa-plus"></i> Increase
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(subjectCard);
+            });
+        }
+
+        // Update progress for a subject
+        function updateProgress(subjectId, change) {
+            const subject = subjects.find(s => s.id === subjectId);
+            
+            // Update the completed count
+            subject.completed += change;
+            
+            // Ensure it stays within bounds (0 to total)
+            if (subject.completed < 0) subject.completed = 0;
+            if (subject.completed > subject.total) subject.completed = subject.total;
+            
+            // Save to cookies
+            saveProgressToCookies();
+            
+            // Update the display
+            const percentage = Math.round((subject.completed / subject.total) * 100);
+            const progressBar = document.getElementById(`${subjectId}-bar`);
+            const progressValue = progressBar.parentElement.previousElementSibling.querySelector('.progress-value');
+            
+            // Animate the progress bar
+            progressBar.style.width = `${percentage}%`;
+            progressValue.textContent = `${subject.completed}/${subject.total} (${percentage}%)`;
+            
+            // Update total progress
+            updateTotalProgress();
+            
+            // Add a subtle animation effect
+            progressBar.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                progressBar.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Calculate and update total progress
+        function updateTotalProgress() {
+            let totalCompleted = 0;
+            let totalTopics = 0;
+            
+            subjects.forEach(subject => {
+                totalCompleted += subject.completed;
+                totalTopics += subject.total;
+            });
+            
+            const totalPercentage = Math.round((totalCompleted / totalTopics) * 100);
+            const remainingTopics = totalTopics - totalCompleted;
+            
+            // Update total progress bar
+            const totalProgressBar = document.getElementById('totalProgressBar');
+            totalProgressBar.style.width = `${totalPercentage}%`;
+            
+            // Update total stats
+            document.getElementById('totalPercentage').textContent = `${totalPercentage}%`;
+            document.getElementById('totalCompleted').textContent = totalCompleted;
+            document.getElementById('totalTopics').textContent = totalTopics;
+            document.getElementById('remainingTopics').textContent = remainingTopics;
+            
+            // Add animation to total progress bar
+            totalProgressBar.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                totalProgressBar.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Reset all progress
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                // Reset to initial values
+                subjects[0].completed = 35; // Maths
+                subjects[1].completed = 30; // Physics
+                subjects[2].completed = 12; // Physical Chemistry
+                subjects[3].completed = 10; // Inorganic Chemistry
+                subjects[4].completed = 12; // Organic Chemistry
+                
+                // Save to cookies
+                saveProgressToCookies();
+                
+                // Re-render everything
+                renderSubjects();
+                updateTotalProgress();
+                
+                // Show confirmation
+                alert('All progress has been reset to initial values.');
+            }
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initTracker);
+    </script>
+</body>
+</html>
