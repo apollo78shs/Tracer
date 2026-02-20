@@ -1,1 +1,515 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Study Progress Tracker</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma;
+}
+
+body{
+background:#0d0d0d;
+color:#eee;
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+header{
+text-align:center;
+border-bottom:2px solid #76b900;
+padding:20px;
+margin-bottom:30px;
+}
+
+.nvidia-logo{
+font-size:2.5rem;
+color:#76b900;
+font-weight:bold;
+display:flex;
+justify-content:center;
+gap:10px;
+}
+
+.stats-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:25px;
+}
+
+.subject-card{
+background:#141414;
+border-radius:12px;
+padding:25px;
+border-left:5px solid #76b900;
+box-shadow:0 5px 15px #000;
+}
+
+.subject-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.subject-title{
+font-size:1.6rem;
+}
+
+.subject-icon{
+font-size:2rem;
+color:#76b900;
+}
+
+.progress-bar{
+height:18px;
+background:#2a2a2a;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:15px;
+}
+
+.progress-fill{
+height:100%;
+background:linear-gradient(90deg,#5a8a1b,#76b900,#a5d721);
+transition:.6s;
+}
+
+.chapter{
+margin:6px 0;
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.chapter input{
+transform:scale(1.2);
+accent-color:#76b900;
+}
+
+.total-progress{
+margin-top:40px;
+background:#141414;
+padding:25px;
+border-radius:12px;
+border-top:5px solid #76b900;
+}
+
+.stat-box{
+text-align:center;
+background:#222;
+padding:15px;
+border-radius:8px;
+min-width:150px;
+}
+
+.total-stats{
+display:flex;
+justify-content:space-around;
+gap:20px;
+flex-wrap:wrap;
+margin-top:20px;
+}
+
+.stat-value{
+font-size:2rem;
+color:#76b900;
+}
+
+.reset-btn{
+margin:30px auto;
+display:block;
+padding:12px 25px;
+background:#222;
+border:2px solid red;
+color:#ff5555;
+border-radius:8px;
+cursor:pointer;
+}
+
+.reset-btn:hover{
+background:red;
+color:white;
+}
+
+footer{
+margin-top:40px;
+text-align:center;
+color:#666;
+border-top:1px solid #333;
+padding:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<div class="nvidia-logo">
+<i class="fas fa-microchip"></i>
+<span>NVIDIA</span>
+</div>
+
+<h1>Study Progress Tracker</h1>
+<p>Chapter-wise progress tracking</p>
+
+</header>
+
+
+<div class="stats-container" id="subjectsContainer"></div>
+
+
+<div class="total-progress">
+
+<h2 style="text-align:center">Overall Progress</h2>
+
+<div class="progress-bar">
+<div class="progress-fill" id="totalBar"></div>
+</div>
+
+<p style="text-align:center;font-size:1.2rem">
+<span id="totalPercent">0%</span>
+</p>
+
+
+<div class="total-stats">
+
+<div class="stat-box">
+<div class="stat-value" id="doneCount">0</div>
+<div>Completed</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-value" id="totalCount">0</div>
+<div>Total</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-value" id="leftCount">0</div>
+<div>Remaining</div>
+</div>
+
+</div>
+
+</div>
+
+
+<button class="reset-btn" onclick="resetAll()">
+<i class="fas fa-redo"></i> Reset All
+</button>
+
+
+<footer>
+Progress saved automatically in cookies
+</footer>
+
+</div>
+
+
+<script>
+
+const subjects = [
+
+{
+id:"maths",
+name:"Mathematics",
+icon:"fas fa-calculator",
+chapters:[
+{name:"Algebra",done:false},
+{name:"Trigonometry",done:false},
+{name:"Calculus",done:false},
+{name:"Vectors",done:false},
+{name:"Probability",done:false}
+]
+},
+
+{
+id:"physics",
+name:"Physics",
+icon:"fas fa-atom",
+chapters:[
+{name:"Kinematics",done:false},
+{name:"Laws of Motion",done:false},
+{name:"Thermodynamics",done:false},
+{name:"Waves",done:false},
+{name:"Optics",done:false}
+]
+},
+
+{
+id:"organic",
+name:"Organic Chemistry",
+icon:"fas fa-brain",
+chapters:[
+{name:"Hydrocarbons",done:false},
+{name:"Alcohols",done:false},
+{name:"Aldehydes",done:false},
+{name:"Amines",done:false}
+]
+},
+
+{
+id:"inorganic",
+name:"Inorganic Chemistry",
+icon:"fas fa-vial",
+chapters:[
+{name:"Periodic Table",done:false},
+{name:"Chemical Bonding",done:false},
+{name:"Coordination",done:false}
+]
+},
+
+{
+id:"physical",
+name:"Physical Chemistry",
+icon:"fas fa-flask",
+chapters:[
+{name:"Mole Concept",done:false},
+{name:"Thermodynamics",done:false},
+{name:"Electrochemistry",done:false}
+]
+}
+
+];
+
+
+
+/* ---------------- COOKIES ---------------- */
+
+function setCookie(name,value,days){
+
+const d=new Date();
+d.setTime(d.getTime()+days*86400000);
+
+document.cookie =
+name+"="+value+
+";expires="+d.toUTCString()+
+";path=/";
+
+}
+
+function getCookie(name){
+
+const n=name+"=";
+const arr=document.cookie.split(";");
+
+for(let c of arr){
+
+c=c.trim();
+
+if(c.startsWith(n)){
+return c.substring(n.length);
+}
+
+}
+
+return null;
+
+}
+
+
+
+/* ------------ SAVE / LOAD --------------- */
+
+function save(){
+
+setCookie("studyData",
+JSON.stringify(subjects),
+30);
+
+}
+
+function load(){
+
+const data=getCookie("studyData");
+
+if(!data) return;
+
+const saved=JSON.parse(data);
+
+saved.forEach((s,i)=>{
+subjects[i].chapters=s.chapters;
+});
+
+}
+
+
+
+/* ------------ RENDER ---------------- */
+
+function render(){
+
+const box=document.getElementById("subjectsContainer");
+
+box.innerHTML="";
+
+
+subjects.forEach(sub=>{
+
+const done=sub.chapters.filter(c=>c.done).length;
+
+const total=sub.chapters.length;
+
+const percent=Math.round(done/total*100);
+
+
+let chapterHTML="";
+
+sub.chapters.forEach((ch,i)=>{
+
+chapterHTML+=`
+
+<div class="chapter">
+
+<input type="checkbox"
+${ch.done?"checked":""}
+onchange="toggle('${sub.id}',${i})">
+
+<span>${ch.name}</span>
+
+</div>
+
+`;
+
+});
+
+
+const card=document.createElement("div");
+
+card.className="subject-card";
+
+card.innerHTML=`
+
+<div class="subject-header">
+
+<h2 class="subject-title">${sub.name}</h2>
+
+<i class="${sub.icon} subject-icon"></i>
+
+</div>
+
+
+<div class="progress-bar">
+
+<div class="progress-fill"
+style="width:${percent}%">
+
+</div>
+
+</div>
+
+<p>${done}/${total} (${percent}%)</p>
+
+<h4>Chapters</h4>
+
+${chapterHTML}
+
+`;
+
+box.appendChild(card);
+
+});
+
+updateTotal();
+
+}
+
+
+
+/* ------------ TOGGLE ---------------- */
+
+function toggle(id,index){
+
+const sub=subjects.find(s=>s.id===id);
+
+sub.chapters[index].done=!sub.chapters[index].done;
+
+save();
+
+render();
+
+}
+
+
+
+/* ------------ TOTAL ---------------- */
+
+function updateTotal(){
+
+let done=0,total=0;
+
+subjects.forEach(s=>{
+
+done+=s.chapters.filter(c=>c.done).length;
+
+total+=s.chapters.length;
+
+});
+
+const percent=Math.round(done/total*100);
+
+document.getElementById("totalBar").style.width=percent+"%";
+
+document.getElementById("totalPercent").innerText=percent+"%";
+
+document.getElementById("doneCount").innerText=done;
+
+document.getElementById("totalCount").innerText=total;
+
+document.getElementById("leftCount").innerText=total-done;
+
+}
+
+
+
+/* ------------ RESET ---------------- */
+
+function resetAll(){
+
+if(!confirm("Reset all progress?")) return;
+
+subjects.forEach(s=>{
+s.chapters.forEach(c=>c.done=false);
+});
+
+save();
+render();
+
+}
+
+
+
+/* ------------ INIT ---------------- */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+load();
+render();
+
+});
+
+</script>
+
+</body>
+</html>
